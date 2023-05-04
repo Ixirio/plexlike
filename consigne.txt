@@ -1,0 +1,21 @@
+PROJET WEB PYTHON : ( Flask ) 
+
+Site de gestion de films --> CRUD 
+
+Film : - image ( Affiche ) 
+       - Titre
+       - Description
+       - Année 
+       - Acteurs
+       - Réalisation/Producteur
+
+BDD au choix ou stockage fichier plat 
+
+Minimum 2 pages : - Liste de tous les films , affiche au minimum affiche et titre du film
+
+minimum afiche et titre du film : 
+                     - Page de visualisation complète d'un film 
+
+Détection visages sur l'affiche du film 
+
+( exemple: serveur PLEX ) 

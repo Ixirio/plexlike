@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  web:
+    container_name: app
+    build:
+      context: .
+      target: builder
+    stop_signal: SIGINT
+    restart: on-failure
+    ports: 
+      - '80:5000'
+    volumes:
+      - ./app/:/app
+  db:
+    image: mongo:5
+    container_name: plex_db
+    restart: on-failure
+    volumes:
+      - db:/data/db
+    ports: 
+      - "27017:27017"
+    environment: 
+      - MONGO_INITDB_ROOT_USERNAME=plex
+      - MONGO_INITDB_ROOT_PASSWORD=plex
+
+volumes:
+  db:
