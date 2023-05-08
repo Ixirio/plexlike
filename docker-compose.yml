@@ -12,6 +12,7 @@ services:
       - '80:5000'
     volumes:
       - ./app/:/app
+
   db:
     image: mongo:5
     container_name: plex_db

@@ -20,6 +20,9 @@ class ActorRepository:
 
     def findById(self, id: str) -> Actor:
         return self.__collection.find_one({'_id' : ObjectId(id)})
+    
+    def findManyByIds(self, ids) -> list[Actor]:
+        return self.__collection.find({'_id': { '$in': ids }})
 
     def findAll(self) -> list[Actor]:
         return [actor for actor in self.__collection.find()]

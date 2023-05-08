@@ -1,16 +1,20 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, render_template
 from database import Database
-from blueprints import MovieBlueprint
+from blueprints import MovieBlueprint, ActorBlueprint
 
 app = Flask(__name__)
+
+app.jinja_env.add_extension('jinja2.ext.debug')
+app.jinja_env.add_extension('jinja2.ext.i18n')
 
 db = Database().getClient()
 
 app.register_blueprint(MovieBlueprint(__name__, db))
+app.register_blueprint(ActorBlueprint(__name__, db))
 
 @app.route('/')
 def home():
-	return 'Hello world'
+	return render_template('base.jinja')
 
 # Route to handle 404 error and redirect user to home page
 @app.errorhandler(404)

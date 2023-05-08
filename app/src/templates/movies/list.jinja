@@ -1,0 +1,21 @@
+{% extends "base.jinja" %}
+
+{% import 'macro.jinja' as oo %}
+
+{% block title %}Movies{% endblock title %}
+
+{% block body %}
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-2 gap-y-6">
+        {% for movie in movies %}
+
+            {{ oo.card(movie) }}
+
+        {% endfor %}
+    </div>
+
+    <a href="{{ url_for('movies.add_get') }}" class="rounded-full bg-secondary absolute bottom-10 right-10 w-10 h-10 flex justify-center text-3xl text-secondary">+</a>
+
+    {# <pre>{% debug %}</pre> #}
+
+{% endblock body %}

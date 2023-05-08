@@ -1,0 +1,6 @@
+{% macro card(item) %}
+    <div class="max-w-sm w-fit h-fit m-auto bg-primary rounded shadow hover:scale-110 transition-all duration-100"
+        id="{{ item.id }}">
+        <img class="rounded" loading="lazy" src="{{ url_for('static', filename='images/'~item.image) }}" alt="{{ item.title }} movie poster" />
+    </div>
+{% endmacro %}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PlexWish - {% block title %}Home{% endblock title %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet" type="text/css" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script type="module" src="{{ url_for('static', filename='assets/index.js') }}"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        backgroundColor: {
+                            primary: '#0e0f0f',
+                            secondary: '#ec3655'
+                        },
+                        colors: {
+                            primary: '#ec3655',
+                            secondary: '#ffffff'
+                        }
+                    }
+                }
+            }
+        </script>
+    </head>
+    <body class="bg-primary">
+        {% include "components/navbar.jinja" %}
+
+        <div class="w-10/12 mx-auto pt-6 ">
+            {% block body %}{% endblock body %}
+        </div>
+
+        {% include "components/footer.jinja" %}
+    </body>
+</html>

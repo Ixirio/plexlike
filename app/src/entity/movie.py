@@ -9,12 +9,12 @@ class Movie:
     __year: datetime
     __actors: list[ObjectId]
 
-    def __init__(self, title: str, year: str, actors: list[str], description = '', image: str = None) -> None:
+    def __init__(self, title: str, year: str, actors: list[ObjectId], description = '', image: str = None) -> None:
         self.__title = title
         self.__description = description
         self.__image = image
         self.__year = datetime.strptime(year, '%Y-%m-%d')
-        self.__actors = [ObjectId(id) for id in actors]
+        self.__actors = actors
 
     def toDict(self) -> dict[str, any]:
         return {
@@ -22,5 +22,5 @@ class Movie:
             'description': self.__description,
             'image': self.__image,
             'year': self.__year,
-            'actors': self.__actors
+            'actors': self.__actors,
         }
