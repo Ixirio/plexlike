@@ -56,7 +56,7 @@ class MovieBlueprint(Blueprint):
                 flash('Movie added sucessfully', 'info')
                 return redirect(url_for('movies.findAll'))
             
-            return render_template('movies/add.jinja')
+            return render_template('movies/add.jinja', actors=self.__actorRepository.findAll())
 
 
 
