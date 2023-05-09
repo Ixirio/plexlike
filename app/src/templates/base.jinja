@@ -29,7 +29,9 @@
     <body class="bg-primary">
         {% include "components/navbar.jinja" %}
 
-        <div class="w-10/12 mx-auto pt-6 ">
+        {% include "components/flash_messages.jinja" %}
+
+        <div class="w-10/12 mx-auto pt-6">
             {% block body %}{% endblock body %}
         </div>
 

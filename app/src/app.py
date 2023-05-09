@@ -3,6 +3,7 @@ from database import Database
 from blueprints import MovieBlueprint, ActorBlueprint
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 app.jinja_env.add_extension('jinja2.ext.debug')
 app.jinja_env.add_extension('jinja2.ext.i18n')

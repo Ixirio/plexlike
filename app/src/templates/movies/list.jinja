@@ -2,19 +2,31 @@
 
 {% import 'macro.jinja' as oo %}
 
+{% set cardOptions = {
+    'actions': {
+        'isEditable'  : true,
+        'isRemovable' : true,
+    },
+    'contentType': 'movies'
+} %}
+
 {% block title %}Movies{% endblock title %}
 
 {% block body %}
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-2 gap-y-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-2 gap-y-6 transition-all duration-100">
         {% for movie in movies %}
 
-            {{ oo.card(movie) }}
+            {{ oo.card(movie, cardOptions) }}
 
         {% endfor %}
     </div>
 
-    <a href="{{ url_for('movies.add_get') }}" class="rounded-full bg-secondary absolute bottom-10 right-10 w-10 h-10 flex justify-center text-3xl text-secondary">+</a>
+    <a href="{{ url_for('movies.add') }}" class="flex fixed rounded-full bottom-5 right-5 w-14 h-14 bg-secondary text-secondary hover:text-primary hover:bg-white transition-all">
+        <svg fill="currentColor" class="w-8 h-8 m-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/>
+        </svg>
+    </a>
 
     {# <pre>{% debug %}</pre> #}
 

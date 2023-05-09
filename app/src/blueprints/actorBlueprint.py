@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, redirect, url_for, request
+from flask import Blueprint, jsonify, redirect, url_for, flash, request
 from repository import ActorRepository
 from entity import Actor
 from pymongo import database
@@ -23,17 +23,20 @@ class ActorBlueprint(Blueprint):
             actor = self.__actorRepository.findById(id)
             return 'actor by id'
 
-        @self.route('/add', methods=['POST'])
-        def add_get():
-            self.__actorRepository.insert(Actor(
-                request.form.get('name'),
-                request.form.get('image')
-            ))
-            return redirect(url_for('actors.findAll'))
+        @self.route('/add', methods=['GET', 'POST'])
+        def add():
+            
+            # TODO : Check that form is complete
+            if request.method == 'POST':
+            
+                self.__actorRepository.insert(Actor(
+                    request.form.get('name'),
+                    request.form.get('image')
+                ))
 
-        @self.route('/add', methods=['GET'])
-        def add_post():
-            return 'add an actor'
+                flash('Sucessfuly added actor', 'info')
+                
+            return redirect(url_for('actors.findAll'))
 
         @self.route('/<id>', methods=['POST'])
         def remove(id):
