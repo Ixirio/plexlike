@@ -7,6 +7,7 @@
         <title>PlexWish - {% block title %}Home{% endblock title %}</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet" type="text/css" />
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
         <script src="https://cdn.tailwindcss.com"></script>
         <script type="module" src="{{ url_for('static', filename='assets/index.js') }}"></script>
         <script>
@@ -35,6 +36,7 @@
             {% block body %}{% endblock body %}
         </div>
 
+        {% include "components/item_container.jinja" %}
         {% include "components/footer.jinja" %}
     </body>
 </html>

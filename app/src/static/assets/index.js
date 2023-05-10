@@ -3,4 +3,3 @@ import itemFrameHandler from './itemFrame.js';
 
 document.addEventListener('DOMContentLoaded', navbarMenuHandler);
 document.addEventListener('DOMContentLoaded', itemFrameHandler);
-
