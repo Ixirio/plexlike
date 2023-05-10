@@ -23,14 +23,11 @@ class MovieBlueprint(Blueprint):
 
         @self.route('/list', methods=['GET'])
         def findAll():
-            movies = self.__movieRepository.findAll()
-            return render_template('movies/list.jinja', movies=movies)
+            return render_template('movies/list.jinja', movies=self.__movieRepository.findAll())
 
         @self.route('/<id>', methods=['GET'])
         def find(id):
-            movie = self.__movieRepository.findById(id)
-            # TODO : Create template to display movie data
-            return redirect(url_for('movies.findAll'))
+            return render_template('movies/movie.jinja', movie=self.__movieRepository.findById(id))
 
         @self.route('/add', methods=['GET', 'POST'])
         def add():
@@ -42,11 +39,11 @@ class MovieBlueprint(Blueprint):
                 
                 image = request.files['image']
                 imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
-                
+
                 self.__movieRepository.insert(Movie(
                     request.form.get('title'),
                     request.form.get('year'),
-                    request.form.get('actors'),
+                    request.form.getlist('actors'),
                     request.form.get('description'),
                     imageName
                 ))
@@ -57,8 +54,6 @@ class MovieBlueprint(Blueprint):
                 return redirect(url_for('movies.findAll'))
             
             return render_template('movies/add.jinja', actors=self.__actorRepository.findAll())
-
-
 
         @self.route('/edit/<id>', methods=['GET', 'POST'])
         def edit(id):

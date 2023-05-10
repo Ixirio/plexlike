@@ -3,9 +3,12 @@ from repository import ActorRepository
 from entity import Actor
 from pymongo import database
 from bson import json_util
+from os.path import abspath, dirname, join
 import json
 
 class ActorBlueprint(Blueprint):
+    
+    IMAGE_UPLOAD_FOLDER = join(abspath(dirname(__name__)), 'src/static/images/actors')
 
     __actorRepository: ActorRepository
 
@@ -26,6 +29,11 @@ class ActorBlueprint(Blueprint):
         @self.route('/add', methods=['GET', 'POST'])
         def add():
             
+            self.__actorRepository.insert(Actor(
+                    'Jules',
+                    '1683676239.png'
+                ))
+
             # TODO : Check that form is complete
             if request.method == 'POST':
             

@@ -11,12 +11,15 @@
             <label for="title">Title:</label>
             <input type="text" id="title" name="title" required>
 
-
             <label for="year">Year:</label>
             <input type="date" id="year" name="year" required>
 
             <label for="actors">Actors:</label>
-            <input type="text" id="actors" name="actors" required placeholder="Enter actors separated by commas">
+            <select required id="actors" name="actors" multiple>
+                {% for actor in actors %}
+                    <option value="{{ actor._id }}">{{ actor.name }}</option>
+                {% endfor %}
+            </select>
 
             <label for="description">Description:</label>
             <textarea id="description" name="description" required></textarea>
@@ -34,6 +37,6 @@
         </button>
     </form>
 
-    <pre class="bg-white">{% debug %}</pre>
+    <!-- <pre class="bg-white">{% debug %}</pre> -->
 
 {% endblock body %}
