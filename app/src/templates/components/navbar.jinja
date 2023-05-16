@@ -3,16 +3,6 @@
 {% set smartphone_active_class = 'block p-4 text-sm font-bold text-primary bg-gray-800 rounded' %}
 {% set smartphone_unactive_class = 'block p-4 text-sm font-bold text-secondary hover:text-primary hover:bg-gray-800 rounded transition-all duration-200' %}
 
-{% set movieRelatedRoutes = [
-	url_for('movies.findAll'),
-	url_for('movies.add')
-] %}
-
-{% set actorRelatedRoutes = [
-	url_for('actors.findAll'),
-	url_for('actors.add')
-] %}
-
 <nav class="bg-primary px-4 py-4 flex justify-between items-center border-b border-[#212429] sticky top-0 z-10 transition-[width] duration-200">
 	<a class="text-3xl font-bold leading-none text-secondary" href="{{ url_for('home') }}">PlexWish</a>
 	<div class="lg:hidden">
@@ -29,11 +19,11 @@
 				href="{{ url_for('home') }}">Home</a>
 		</li>
 		<li>
-			<a class="{{ desktop_active_class if request.path in movieRelatedRoutes else desktop_unactive_class }}"
+			<a class="{{ desktop_active_class if request.url_rule.endpoint in movies_routes() else desktop_unactive_class }}"
 				href="{{ url_for('movies.findAll') }}">Movies</a>
 		</li>
 		<li>
-			<a class="{{ desktop_active_class if request.path in actorsRelatedRoutes else desktop_unactive_class }}"
+			<a class="{{ desktop_active_class if request.url_rule.endpoint in actors_routes() else desktop_unactive_class }}"
 				href="{{ url_for('actors.findAll') }}">Actors</a>
 		</li>
 	</ul>
@@ -58,15 +48,15 @@
 		<div>
 			<ul>
 				<li class="mb-1">
-					<a class="{{ smartphone_active_class if url_for('home') == request.path else smartphone_unactive_class }}"
+					<a class="{{ smartphone_active_class if request.url_rule.endpoint == 'home' else smartphone_unactive_class }}"
 						href="{{ url_for('home') }}">Home</a>
 				</li>
 				<li class="mb-1">
-					<a class="{{ smartphone_active_class if request.path in movieRelatedRoutes else smartphone_unactive_class }}"
+					<a class="{{ smartphone_active_class if request.url_rule.endpoint in movies_routes() else smartphone_unactive_class }}"
 						href="{{ url_for('movies.findAll') }}">Movies</a>
 				</li>
 				<li class="mb-1">
-					<a class="{{ smartphone_active_class if request.path in actorsRelatedRoutes else smartphone_unactive_class }}"
+					<a class="{{ smartphone_active_class if request.url_rule.endpoint in actors_routes() else smartphone_unactive_class }}"
 						href="{{ url_for('actors.findAll') }}">Actors</a>
 				</li>
 			</ul>

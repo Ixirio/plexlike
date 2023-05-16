@@ -1,0 +1,85 @@
+{% extends "base.jinja" %}
+
+{% block title %}Movies - add{% endblock title %}
+
+{% block body %}  
+
+<form action="{{ url_for('movies.add') if request.url_rule.endpoint == 'movies.add' else url_for('movies.edit', id=movie._id) }}" method="post" enctype="multipart/form-data" class="mx-auto">
+  <div class="space-y-12 text-secondary">
+
+    <div class="border-b border-gray-900/10 pb-12 text-secondary">
+      <h2 class="text-base font-semibold leading-7">About the movie</h2>
+
+      <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+        <div class="sm:col-span-3">
+          <label for="movie" class="block text-sm font-medium leading-6">Movie name</label>
+          <div class="mt-2">
+            <input type="text" name="movie" id="movie" required value="{% if movie %}{{ movie.title }}{% endif %}"
+            class="block w-full rounded-md py-1.5 border-0 bg-gray-800 shadow-sm ring-1 ring-inset ring-opacity-50 ring-gray-500 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          </div>
+        </div>
+
+        <div class="sm:col-span-3">
+          <label for="release" class="block text-sm font-medium leading-6 ">Release date</label>
+          <div class="mt-2">
+            <input type="date" name="release" id="release"
+            class="block w-full rounded-md border-0 py-1.5 bg-gray-800 shadow-sm ring-1 ring-inset ring-opacity-50 ring-gray-500 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            required value="{% if movie %}{{ movie.year.strftime('%Y-%m-%d') }}{% endif %}">
+          </div>
+        </div>
+
+        <div class="col-span-full">
+          <label for="description" class="block text-sm font-medium leading-6">Description</label>
+          <div class="mt-2">
+            <textarea id="description" name="description" rows="3" class="block w-full rounded-md border-0 py-1.5 bg-gray-800 shadow-sm ring-1 ring-inset ring-opacity-50 ring-gray-500 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            placeholder="Write a few sentences about the film.">{% if movie %}{{ movie.description }}{% endif %}</textarea>
+          </div>
+        </div>
+
+        <div class="sm:col-span-3">
+          <label for="actors" class="block text-sm font-medium leading-6">Actors</label>
+          <div class="mt-2">
+            <select multiple id="actors" name="actors" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+              {% for actor in actors %}
+                  <option {% if movie and actor in movie.actors %} selected {% endif %} value="{{ actor._id }}">{{ actor.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="sm:col-span-3">
+          <label for="image" class="block text-sm font-medium leading-6 text-gray-900">Cover photo</label>
+          <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 bg-white">
+            <div class="text-center">
+            {% if movie and movie.image %}
+            <div class="rounded-md relative max-w-xs overflow-hidden bg-cover bg-no-repeat">
+              <img data-image-preview src="{{ url_for('static',  filename='images/movies/'~movie.image) }}" class="transition duration-300 ease-in-out hover:scale-110 border border-opacity-50 border-gray-500">
+            </div>
+            {% else %}
+              <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
+              </svg>
+            {% endif %}
+              <div class="mt-4 flex text-sm leading-6 text-gray-600">
+                <label for="image" class="mx-auto cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                  <span>Upload an image</span>
+                  <input data-image-input id="image" name="image" type="file" class="sr-only" accept="image/*" required>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="fixed rounded-full bottom-5 right-5 w-14 h-14 text-secondary bg-green-600" type="submit">
+      <svg fill="currentColor" class="w-8 h-8 m-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+          <path
+              d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V173.3c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32H64zm0 96c0-17.7 14.3-32 32-32H288c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V128zM224 288a64 64 0 1 1 0 128 64 64 0 1 1 0-128z" />
+      </svg>
+  </button>
+
+</form>
+
+{% endblock body %}

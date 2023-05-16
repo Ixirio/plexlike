@@ -19,19 +19,21 @@ class MovieRepository:
         self.__collection.delete_one({'_id': ObjectId(id)})
 
     def update(self, id: str, movie: Movie) -> None:
-        self.__collection.update_one({'_id': ObjectId(id)}, movie.toDict())
+        self.__collection.update_one({'_id': ObjectId(id)}, {'$set': movie.toDict()})
 
-    def findById(self, id: str) -> Movie:
+    def findById(self, id: str, hydrateActors: bool = True) -> Movie:
         movie = self.__collection.find_one({'_id' : ObjectId(id)})
 
-        movie['actors'] = self.__actorRepository.findManyByIds(movie['actors'])
+        if hydrateActors:
+            movie['actors'] = self.__actorRepository.findManyByIds(movie['actors'])
 
         return movie
 
-    def findAll(self) -> list[Movie]:
+    def findAll(self, hydrateActors: bool = True) -> list[Movie]:
         movies = [movie for movie in self.__collection.find()]
 
-        for movie in movies:
-            movie['actors'] = self.__actorRepository.findManyByIds(movie['actors'])
+        if hydrateActors:
+            for movie in movies:
+                movie['actors'] = self.__actorRepository.findManyByIds(movie['actors'])
 
         return movies

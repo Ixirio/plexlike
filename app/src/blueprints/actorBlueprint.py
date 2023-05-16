@@ -50,3 +50,10 @@ class ActorBlueprint(Blueprint):
         def remove(id):
             self.__actorRepository.remove(id)
             return redirect(url_for('actors.findAll'))
+
+    def getRoutes(self) -> dict:
+        return {
+            'actors.findAll',
+            'actors.add',
+            'actors.edit',
+        }

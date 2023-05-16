@@ -42,7 +42,7 @@ class MovieBlueprint(Blueprint):
 
                 self.__movieRepository.insert(Movie(
                     request.form.get('title'),
-                    request.form.get('year'),
+                    request.form.get('release'),
                     request.form.getlist('actors'),
                     request.form.get('description'),
                     imageName
@@ -52,12 +52,38 @@ class MovieBlueprint(Blueprint):
 
                 flash('Movie added sucessfully', 'info')
                 return redirect(url_for('movies.findAll'))
-            
-            return render_template('movies/add.jinja', actors=self.__actorRepository.findAll())
+
+            return render_template('movies/form.jinja', actors=self.__actorRepository.findAll())
 
         @self.route('/edit/<id>', methods=['GET', 'POST'])
         def edit(id):
-            return redirect(url_for('movies.findAll'))
+
+            movie = self.__movieRepository.findById(id)
+
+            if request.method == 'POST':    
+                if not self.isFormFullFilled(request):
+                    flash('Some fields are missing in the form, try again', 'warn')
+                    return redirect(url_for('movies.edit'))
+                
+                removeFile(join(self.IMAGE_UPLOAD_FOLDER, movie['image']))
+                
+                image = request.files['image']
+                imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
+
+                self.__movieRepository.update(id, Movie(
+                    request.form.get('title'),
+                    request.form.get('release'),
+                    request.form.getlist('actors'),
+                    request.form.get('description'),
+                    imageName
+                ))
+
+                image.save(join(self.IMAGE_UPLOAD_FOLDER, imageName))
+
+                flash('Movie updated sucessfully', 'info')
+                return redirect(url_for('movies.findAll'))
+
+            return render_template('movies/form.jinja', actors=self.__actorRepository.findAll(), movie=movie)
 
         @self.route('/remove/<id>', methods=['GET'])
         def remove(id):
@@ -76,3 +102,10 @@ class MovieBlueprint(Blueprint):
         if request.files['image'] == None or request.files['image'].filename == '':
             return False
         return True
+
+    def getRoutes(self) -> dict:
+        return {
+            'movies.findAll',
+            'movies.add',
+            'movies.edit',
+        }
