@@ -31,12 +31,12 @@ class MovieBlueprint(Blueprint):
 
         @self.route('/add', methods=['GET', 'POST'])
         def add():
-            
+
             if request.method == 'POST':    
                 if not self.isFormFullFilled(request):
                     flash('Some fields are missing in the form, try again', 'warn')
                     return redirect(url_for('movies.add'))
-                
+
                 image = request.files['image']
                 imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
 
@@ -61,21 +61,23 @@ class MovieBlueprint(Blueprint):
             movie = self.__movieRepository.findById(id)
 
             if request.method == 'POST':    
-                if not self.isFormFullFilled(request):
+                if not self.isFormFullFilled(request, True):
                     flash('Some fields are missing in the form, try again', 'warn')
-                    return redirect(url_for('movies.edit'))
+                    return redirect(url_for('movies.edit', id=movie['_id']))
                 
-                removeFile(join(self.IMAGE_UPLOAD_FOLDER, movie['image']))
+                if (request.files['image'] != None or request.files['image'].filename != ''):
                 
-                image = request.files['image']
-                imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
+                    removeFile(join(self.IMAGE_UPLOAD_FOLDER, movie['image']))
+
+                    image = request.files['image']
+                    imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
 
                 self.__movieRepository.update(id, Movie(
                     request.form.get('title'),
                     request.form.get('release'),
                     request.form.getlist('actors'),
                     request.form.get('description'),
-                    imageName
+                    imageName if imageName else movie['image']
                 ))
 
                 image.save(join(self.IMAGE_UPLOAD_FOLDER, imageName))
@@ -87,19 +89,19 @@ class MovieBlueprint(Blueprint):
 
         @self.route('/remove/<id>', methods=['GET'])
         def remove(id):
-            
+
             removeFile(join(self.IMAGE_UPLOAD_FOLDER, self.__movieRepository.findById(id)['image']))
-            
+
             self.__movieRepository.remove(id)
             flash('Movie removed sucessfully', 'info')
             return redirect(url_for('movies.findAll'))
 
-    def isFormFullFilled(self, request: Request) -> bool:
-        form = request.form
-        for input in form:
-            if form.get(input) in ['', None] :
+    def isFormFullFilled(self, request: Request, imageIsPresent: bool = False) -> bool:
+        for input in request.form:
+            if request.form.get(input) in ['', None]:
                 return False
-        if request.files['image'] == None or request.files['image'].filename == '':
+
+        if not imageIsPresent and (request.files['image'] == None or request.files['image'].filename == ''):
             return False
         return True
 
