@@ -2,6 +2,10 @@ const previewImage = () => {
     const imageInput = document.querySelector('[data-image-input]');
     const imagePreview = document.querySelector('[data-image-preview]');
 
+    if (imageInput === null) {
+        return;
+    }
+
     imageInput.addEventListener('change', () => {
         const reader = new FileReader();
         reader.onload = () => {

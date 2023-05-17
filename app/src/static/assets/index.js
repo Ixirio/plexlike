@@ -4,5 +4,4 @@ import previewImage from './imagePreviewer.js';
 
 document.addEventListener('DOMContentLoaded', navbarMenuHandler);
 document.addEventListener('DOMContentLoaded', itemFrameHandler);
-
 document.addEventListener('DOMContentLoaded', previewImage);
