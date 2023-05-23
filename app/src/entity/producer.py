@@ -1,4 +1,4 @@
-class Actor:
+class Producer:
 
     firstName: str
     lastName: str

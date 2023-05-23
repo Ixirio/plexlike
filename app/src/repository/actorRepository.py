@@ -16,7 +16,7 @@ class ActorRepository:
         self.__collection.delete_one({'_id': ObjectId(id)})
 
     def update(self, id: str, actor: Actor) -> None:
-        self.__collection.update_one({'_id': ObjectId(id)}, actor.toDict())
+        self.__collection.update_one({'_id': ObjectId(id)}, {'$set': actor.toDict()})
 
     def findById(self, id: str) -> Actor:
         return self.__collection.find_one({'_id' : ObjectId(id)})

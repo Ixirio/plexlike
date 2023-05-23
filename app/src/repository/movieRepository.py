@@ -2,15 +2,18 @@ from pymongo import collection
 from bson import ObjectId
 from entity import Movie
 from .actorRepository import ActorRepository
+from .producerRepository import ProducerRepository
 
 class MovieRepository:
 
     __collection: collection.Collection
     __actorRepository: ActorRepository
+    __producerRepository: ProducerRepository
 
-    def __init__(self, collection: collection.Collection, actorRepository: ActorRepository) -> None:
+    def __init__(self, collection: collection.Collection, actorRepository: ActorRepository, producerRepository: ProducerRepository) -> None:
         self.__collection = collection
         self.__actorRepository = actorRepository
+        self.__producerRepository = producerRepository
 
     def insert(self, movie: Movie) -> None:
         self.__collection.insert_one(movie.toDict())
@@ -21,19 +24,23 @@ class MovieRepository:
     def update(self, id: str, movie: Movie) -> None:
         self.__collection.update_one({'_id': ObjectId(id)}, {'$set': movie.toDict()})
 
-    def findById(self, id: str, hydrateActors: bool = True) -> Movie:
+    def findById(self, id: str, hydrateActors: bool = True, hydrateProducers: bool = True) -> Movie:
         movie = self.__collection.find_one({'_id' : ObjectId(id)})
 
         if hydrateActors:
             movie['actors'] = self.__actorRepository.findManyByIds(movie['actors'])
 
+        if hydrateProducers:
+            movie['producers'] = self.__producerRepository.findManyByIds(movie['producers'])
+
         return movie
 
-    def findAll(self, hydrateActors: bool = True) -> list[Movie]:
+    def findAll(self, hydrateActors: bool = True, hydrateProducers: bool = True) -> list[Movie]:
         movies = [movie for movie in self.__collection.find()]
 
-        if hydrateActors:
-            for movie in movies:
-                movie['actors'] = self.__actorRepository.findManyByIds(movie['actors'])
+        for movie in movies:
+            if hydrateActors: movie['actors'] = self.__actorRepository.findManyByIds(movie['actors'])
+
+            if hydrateProducers: movie['producers'] = self.__actorRepository.findManyByIds(movie['producers'])
 
         return movies

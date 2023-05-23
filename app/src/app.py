@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, render_template
 from database import Database
-from blueprints import MovieBlueprint, ActorBlueprint
+from blueprints import MovieBlueprint, ActorBlueprint, ProducerBlueprint
 from jinja2 import Environment, FileSystemLoader
 
 app = Flask(__name__)
@@ -13,17 +13,19 @@ db = Database().getClient()
 
 movieBlueprint = MovieBlueprint(__name__, db)
 actorBlueprint = ActorBlueprint(__name__, db)
+producerBlueprint = ProducerBlueprint(__name__, db)
 
 function = {
 	'movies_routes': movieBlueprint.getRoutes,
-	'actors_routes': actorBlueprint.getRoutes
+	'actors_routes': actorBlueprint.getRoutes,
+	'producers_routes': producerBlueprint.getRoutes
 }
 
 app.register_blueprint(movieBlueprint)
 app.register_blueprint(actorBlueprint)
+app.register_blueprint(producerBlueprint)
 
 app.jinja_env.globals.update(function)
-
 
 @app.route('/')
 def home():

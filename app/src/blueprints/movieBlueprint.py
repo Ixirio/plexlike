@@ -1,11 +1,9 @@
-from flask import Blueprint, Request, jsonify, redirect, url_for, render_template, flash, request
-from repository import MovieRepository, ActorRepository
+from flask import Blueprint, Request, redirect, url_for, render_template, flash, request
+from repository import MovieRepository, ActorRepository, ProducerRepository
 from werkzeug.utils import secure_filename
 from pymongo import database
-from bson import json_util
 from entity import Movie
 from time import time
-from json import loads as jsonLoads
 from os import remove as removeFile
 from os.path import abspath, dirname, join
 
@@ -15,11 +13,13 @@ class MovieBlueprint(Blueprint):
 
     __actorRepository: ActorRepository
     __movieRepository: MovieRepository
+    __producerRepository: ProducerRepository
 
     def __init__(self, import_name: str, db: database.Database, **kwargs):
         super().__init__('movies', import_name, url_prefix="/movies", **kwargs)
         self.__actorRepository = ActorRepository(db.get_collection('actors'))
-        self.__movieRepository = MovieRepository(db.get_collection('movies'), self.__actorRepository)
+        self.__producerRepository = ProducerRepository(db.get_collection('producers'))
+        self.__movieRepository = MovieRepository(db.get_collection('movies'), self.__actorRepository, self.__producerRepository)
 
         @self.route('/list', methods=['GET'])
         def findAll():
@@ -44,6 +44,7 @@ class MovieBlueprint(Blueprint):
                     request.form.get('title'),
                     request.form.get('release'),
                     request.form.getlist('actors'),
+                    request.form.getlist('producers'),
                     request.form.get('description'),
                     imageName
                 ))
@@ -76,6 +77,7 @@ class MovieBlueprint(Blueprint):
                     request.form.get('title'),
                     request.form.get('release'),
                     request.form.getlist('actors'),
+                    request.form.getlist('producers'),
                     request.form.get('description'),
                     imageName if imageName else movie['image']
                 ))
@@ -100,7 +102,7 @@ class MovieBlueprint(Blueprint):
         for input in request.form:
             if request.form.get(input) in ['', None]:
                 return False
-
+                
         if not imageIsPresent and (request.files['image'] == None or request.files['image'].filename == ''):
             return False
         return True

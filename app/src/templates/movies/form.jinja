@@ -2,11 +2,10 @@
 
 {% block title %}Movies{% endblock title %}
 
-{% block body %}  
+{% block body %}
 
-<form action="{{ url_for('movies.add') if request.url_rule.endpoint == 'movies.add' else url_for('movies.edit', id=movie._id) }}" method="post" enctype="multipart/form-data" class="mx-auto">
+<form action="{{ url_for('movies.add') if request.url_rule.endpoint == 'movies.add' else url_for('movies.edit', id=movie._id) }}" method="post" enctype="multipart/form-data" class="mx-auto w-full lg:w-4/6">
   <div class="space-y-12 text-secondary">
-
     <div class="border-b border-gray-900/10 pb-12 text-secondary">
       <h2 class="text-base font-semibold leading-7">About the movie</h2>
 
@@ -34,7 +33,16 @@
           <label for="actors" class="block text-sm font-medium leading-6">Actors</label>
             <select multiple id="actors" name="actors" class="block w-full text-secondary rounded-md border-0 py-1.5 text-gray-900 bg-gray-800 shadow-sm ring-1 ring-inset ring-opacity-50 ring-gray-500 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 transition-all duration-300">
               {% for actor in actors %}
-                  <option {% if movie and actor in movie.actors %} selected {% endif %} value="{{ actor._id }}">{{ actor.name }}</option>
+                  <option {% if movie and actor in movie.actors %} selected {% endif %} value="{{ actor._id }}">{{ actor.firstName }} {{ actor.lastName }}</option>
+              {% endfor %}
+            </select>
+        </div>
+
+        <div class="sm:col-span-3">
+          <label for="producers" class="block text-sm font-medium leading-6">Producers</label>
+            <select multiple id="producers" name="producers" class="block w-full text-secondary rounded-md border-0 py-1.5 text-gray-900 bg-gray-800 shadow-sm ring-1 ring-inset ring-opacity-50 ring-gray-500 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 transition-all duration-300">
+              {% for producer in producers %}
+                  <option {% if movie and producer in movie.producers %} selected {% endif %} value="{{ producer._id }}">{{ producer.name }}</option>
               {% endfor %}
             </select>
         </div>
