@@ -1,0 +1,15 @@
+{% extends "base.jinja" %}
+
+
+{% block title %}Error{% endblock title %}
+
+{% block body %}
+
+    <div class="relative bg-primary rounded-lg shadow border-2 border-[#212429] text-secondary w-full md:w-[30rem] max-w-[30rem] h-36 mx-auto mt-20">
+        <div class="absolute -top-5 left-6 w-24 h-8 bg-orange-500 text-secondary font-bold rounded text-center py-1">
+            <p>ERROR 500</p>
+        </div>
+        <p class="p-4">An error occured ! PLease contact your administrator</p>
+    </div>
+
+{% endblock body %}

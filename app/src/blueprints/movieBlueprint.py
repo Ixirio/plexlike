@@ -5,7 +5,8 @@ from pymongo import database
 from entity import Movie
 from time import time
 from os import remove as removeFile
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname, join, isfile
+from services import FaceDetector
 
 class MovieBlueprint(Blueprint):
 
@@ -40,21 +41,28 @@ class MovieBlueprint(Blueprint):
                 image = request.files['image']
                 imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
 
-                self.__movieRepository.insert(Movie(
-                    request.form.get('title'),
-                    request.form.get('release'),
-                    request.form.getlist('actors'),
-                    request.form.getlist('producers'),
-                    request.form.get('description'),
-                    imageName
-                ))
-
-                image.save(join(self.IMAGE_UPLOAD_FOLDER, imageName))
+                pathToImage = join(self.IMAGE_UPLOAD_FOLDER, imageName)
+                print(request.form, flush=True)
+                try:
+                    image.save(pathToImage)
+                    if request.form.get('facedetection', type=bool): FaceDetector().detect(pathToImage)
+                    # TODO : checkbox return on or off, transform this value to boolean
+                    self.__movieRepository.update(id, Movie(
+                        request.form.get('title'),
+                        request.form.get('release'),
+                        request.form.getlist('actors'),
+                        request.form.getlist('producers'),
+                        request.form.get('description'),
+                        imageName
+                    ))
+                except:
+                    pass
+                    # return render_template('errors/error_500.html.jinja')
 
                 flash('Movie added sucessfully', 'info')
                 return redirect(url_for('movies.findAll'))
 
-            return render_template('movies/form.jinja', actors=self.__actorRepository.findAll())
+            return render_template('movies/form.jinja', actors=self.__actorRepository.findAll(), producers=self.__producerRepository.findAll())
 
         @self.route('/edit/<id>', methods=['GET', 'POST'])
         def edit(id):
@@ -68,26 +76,34 @@ class MovieBlueprint(Blueprint):
                 
                 if (request.files['image'] != None or request.files['image'].filename != ''):
                 
-                    removeFile(join(self.IMAGE_UPLOAD_FOLDER, movie['image']))
+                    imagePath = join(self.IMAGE_UPLOAD_FOLDER, movie['image'])
+                    if isfile(imagePath): removeFile(imagePath)
 
                     image = request.files['image']
                     imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
+                else:
+                    imageName = movie['image']
 
-                self.__movieRepository.update(id, Movie(
-                    request.form.get('title'),
-                    request.form.get('release'),
-                    request.form.getlist('actors'),
-                    request.form.getlist('producers'),
-                    request.form.get('description'),
-                    imageName if imageName else movie['image']
-                ))
+                pathToImage = join(self.IMAGE_UPLOAD_FOLDER, imageName)
 
-                image.save(join(self.IMAGE_UPLOAD_FOLDER, imageName))
+                try:
+                    image.save(pathToImage)
+                    if request.form.get('facedetection', type=bool): FaceDetector().detect(pathToImage)
+                    self.__movieRepository.update(id, Movie(
+                        request.form.get('title'),
+                        request.form.get('release'),
+                        request.form.getlist('actors'),
+                        request.form.getlist('producers'),
+                        request.form.get('description'),
+                        imageName if imageName else movie['image']
+                    ))
+                except:
+                    return render_template('errors/error_500.html.jinja')
 
                 flash('Movie updated sucessfully', 'info')
                 return redirect(url_for('movies.findAll'))
 
-            return render_template('movies/form.jinja', actors=self.__actorRepository.findAll(), movie=movie)
+            return render_template('movies/form.jinja', actors=self.__actorRepository.findAll(), producers=self.__producerRepository.findAll(), movie=movie)
 
         @self.route('/remove/<id>', methods=['GET'])
         def remove(id):

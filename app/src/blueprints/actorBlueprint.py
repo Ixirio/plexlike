@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from os import remove as removeFile
 from os.path import abspath, dirname, join
 from time import time
+from services import FaceDetector
 
 class ActorBlueprint(Blueprint):
     
@@ -35,13 +36,18 @@ class ActorBlueprint(Blueprint):
                 image = request.files['image']
                 imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
 
-                self.__actorRepository.insert(Actor(
-                    request.form.get('firstname'),
-                    request.form.get('lastname'),
-                    imageName
-                ))
-
-                image.save(join(self.IMAGE_UPLOAD_FOLDER, imageName))
+                pathToImage = join(self.IMAGE_UPLOAD_FOLDER, imageName)
+                
+                try:
+                    image.save(pathToImage)
+                    FaceDetector().detect(pathToImage)
+                    self.__actorRepository.insert(Actor(
+                        request.form.get('firstname'),
+                        request.form.get('lastname'),
+                        imageName
+                    ))
+                except:
+                    return render_template('errors/error_500.html.jinja')
 
                 flash('Actor added sucessfully', 'info')
                 return redirect(url_for('actors.findAll'))
@@ -64,14 +70,21 @@ class ActorBlueprint(Blueprint):
 
                     image = request.files['image']
                     imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
+                else:
+                    imageName = actor['image']
 
-                self.__actorRepository.update(id, Actor(
-                    request.form.get('firstname'),
-                    request.form.get('lastname'),
-                    imageName if imageName else actor['image']
-                ))
-
-                image.save(join(self.IMAGE_UPLOAD_FOLDER, imageName))
+                pathToImage = join(self.IMAGE_UPLOAD_FOLDER, imageName)
+                
+                try:
+                    image.save(pathToImage)
+                    FaceDetector().detect(pathToImage)
+                    self.__actorRepository.insert(Actor(
+                        request.form.get('firstname'),
+                        request.form.get('lastname'),
+                        imageName
+                    ))
+                except:
+                    return render_template('errors/error_500.html.jinja')
 
                 flash('Actor updated sucessfully', 'info')
                 return redirect(url_for('actors.findAll'))

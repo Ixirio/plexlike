@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from os import remove as removeFile
 from os.path import abspath, dirname, join
 from time import time
+from services import FaceDetector
 
 class ProducerBlueprint(Blueprint):
     
@@ -35,14 +36,18 @@ class ProducerBlueprint(Blueprint):
 
                 image = request.files['image']
                 imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
-
-                self.__producerRepository.insert(Producer(
-                    request.form.get('firstname'),
-                    request.form.get('lastname'),
-                    imageName
-                ))
-
-                image.save(join(self.IMAGE_UPLOAD_FOLDER, imageName))
+                pathToImage = join(self.IMAGE_UPLOAD_FOLDER, imageName)
+                
+                try:
+                    image.save(pathToImage)
+                    FaceDetector().detect(pathToImage)
+                    self.__producerRepository.insert(Producer(
+                        request.form.get('firstname'),
+                        request.form.get('lastname'),
+                        imageName
+                    ))
+                except:
+                    return render_template('errors/error_500.html.jinja')
 
                 flash('Producer added sucessfully', 'info')
                 return redirect(url_for('producers.findAll'))
@@ -65,14 +70,21 @@ class ProducerBlueprint(Blueprint):
 
                     image = request.files['image']
                     imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
+                else:
+                    imageName = producer['image']
 
-                self.__producerRepository.update(id, Producer(
-                    request.form.get('firstname'),
-                    request.form.get('lastname'),
-                    imageName if imageName else producer['image']
-                ))
+                pathToImage = join(self.IMAGE_UPLOAD_FOLDER, imageName)
 
-                image.save(join(self.IMAGE_UPLOAD_FOLDER, imageName))
+                try:
+                    image.save(pathToImage)
+                    FaceDetector().detect(pathToImage)
+                    self.__producerRepository.insert(Producer(
+                        request.form.get('firstname'),
+                        request.form.get('lastname'),
+                        imageName
+                    ))
+                except:
+                    return render_template('errors/error_500.html.jinja')
 
                 flash('Producer updated sucessfully', 'info')
                 return redirect(url_for('producers.findAll'))
