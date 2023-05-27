@@ -30,11 +30,18 @@
                 <img data-image-preview src="{{ url_for('static', filename='images/actors/'~actor.image) if actor }}"
                 class="transition-all duration-300 rounded-md hover:scale-110">
               </div>
-              <div class="flex text-sm leading-6 text-gray-600">
+              <div class="flex flex-col text-sm leading-6 text-gray-600 md:flex-row">
                 <label for="image" class="mx-auto p-2 cursor-pointer rounded-md bg-blue-700 hover:bg-blue-800 font-semibold text-secondary hover:text-gray-200 transition-all duration-300">
                   <span>Upload an image</span>
                   <input data-image-input id="image" name="image" type="file" class="sr-only" accept="image/*">
                 </label>
+                <div class="mt-4 md:mt-2 md:ml-4">
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="facedetection" name="facedetection" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Toggle face detection</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>

@@ -7,6 +7,7 @@ from time import time
 from os import remove as removeFile
 from os.path import abspath, dirname, join, isfile
 from services import FaceDetector
+from services.transformer import CheckboxValueToBoolTransformer
 
 class MovieBlueprint(Blueprint):
 
@@ -15,12 +16,14 @@ class MovieBlueprint(Blueprint):
     __actorRepository: ActorRepository
     __movieRepository: MovieRepository
     __producerRepository: ProducerRepository
+    __checkboxValueToBoolTransformer: CheckboxValueToBoolTransformer
 
     def __init__(self, import_name: str, db: database.Database, **kwargs):
         super().__init__('movies', import_name, url_prefix="/movies", **kwargs)
         self.__actorRepository = ActorRepository(db.get_collection('actors'))
         self.__producerRepository = ProducerRepository(db.get_collection('producers'))
         self.__movieRepository = MovieRepository(db.get_collection('movies'), self.__actorRepository, self.__producerRepository)
+        self.__checkboxValueToBoolTransformer = CheckboxValueToBoolTransformer()
 
         @self.route('/list', methods=['GET'])
         def findAll():
@@ -35,19 +38,19 @@ class MovieBlueprint(Blueprint):
 
             if request.method == 'POST':    
                 if not self.isFormFullFilled(request):
-                    flash('Some fields are missing in the form, try again', 'warn')
+                    flash('Some fields are missing in the form, try again', 'warning')
                     return redirect(url_for('movies.add'))
 
                 image = request.files['image']
                 imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
 
                 pathToImage = join(self.IMAGE_UPLOAD_FOLDER, imageName)
-                print(request.form, flush=True)
                 try:
                     image.save(pathToImage)
-                    if request.form.get('facedetection', type=bool): FaceDetector().detect(pathToImage)
-                    # TODO : checkbox return on or off, transform this value to boolean
-                    self.__movieRepository.update(id, Movie(
+                    if (self.__checkboxValueToBoolTransformer.transform(request.form.get('facedetection'))):
+                        FaceDetector().detect(pathToImage)
+
+                    self.__movieRepository.insert(Movie(
                         request.form.get('title'),
                         request.form.get('release'),
                         request.form.getlist('actors'),
@@ -56,10 +59,9 @@ class MovieBlueprint(Blueprint):
                         imageName
                     ))
                 except:
-                    pass
-                    # return render_template('errors/error_500.html.jinja')
+                    return render_template('errors/error_500.html.jinja')
 
-                flash('Movie added sucessfully', 'info')
+                flash('Movie added sucessfully', 'success')
                 return redirect(url_for('movies.findAll'))
 
             return render_template('movies/form.jinja', actors=self.__actorRepository.findAll(), producers=self.__producerRepository.findAll())
@@ -71,36 +73,39 @@ class MovieBlueprint(Blueprint):
 
             if request.method == 'POST':    
                 if not self.isFormFullFilled(request, True):
-                    flash('Some fields are missing in the form, try again', 'warn')
+                    flash('Some fields are missing in the form, try again', 'warning')
                     return redirect(url_for('movies.edit', id=movie['_id']))
-                
-                if (request.files['image'] != None or request.files['image'].filename != ''):
-                
-                    imagePath = join(self.IMAGE_UPLOAD_FOLDER, movie['image'])
-                    if isfile(imagePath): removeFile(imagePath)
+
+                if (request.files['image'].filename != ''):
+                    pathToImage = join(self.IMAGE_UPLOAD_FOLDER, movie['image'])
+                    if isfile(pathToImage): removeFile(pathToImage)
 
                     image = request.files['image']
                     imageName = secure_filename(f"{int(time())}.{image.filename.split('.')[-1]}")
                 else:
+                    image = None
                     imageName = movie['image']
 
                 pathToImage = join(self.IMAGE_UPLOAD_FOLDER, imageName)
 
                 try:
-                    image.save(pathToImage)
-                    if request.form.get('facedetection', type=bool): FaceDetector().detect(pathToImage)
+                    if (image is not None): image.save(pathToImage)
+
+                    if (self.__checkboxValueToBoolTransformer.transform(request.form.get('facedetection'))):
+                        FaceDetector().detect(pathToImage)
+
                     self.__movieRepository.update(id, Movie(
                         request.form.get('title'),
                         request.form.get('release'),
                         request.form.getlist('actors'),
                         request.form.getlist('producers'),
                         request.form.get('description'),
-                        imageName if imageName else movie['image']
+                        imageName
                     ))
                 except:
                     return render_template('errors/error_500.html.jinja')
 
-                flash('Movie updated sucessfully', 'info')
+                flash('Movie updated sucessfully', 'success')
                 return redirect(url_for('movies.findAll'))
 
             return render_template('movies/form.jinja', actors=self.__actorRepository.findAll(), producers=self.__producerRepository.findAll(), movie=movie)
@@ -111,14 +116,14 @@ class MovieBlueprint(Blueprint):
             removeFile(join(self.IMAGE_UPLOAD_FOLDER, self.__movieRepository.findById(id)['image']))
 
             self.__movieRepository.remove(id)
-            flash('Movie removed sucessfully', 'info')
+            flash('Movie removed sucessfully', 'success')
             return redirect(url_for('movies.findAll'))
 
     def isFormFullFilled(self, request: Request, imageIsPresent: bool = False) -> bool:
         for input in request.form:
             if request.form.get(input) in ['', None]:
                 return False
-                
+
         if not imageIsPresent and (request.files['image'] == None or request.files['image'].filename == ''):
             return False
         return True
