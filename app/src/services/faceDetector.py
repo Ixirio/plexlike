@@ -8,7 +8,7 @@ class FaceDetector:
     def __init__(self) -> None:
         self.__faceCascade = CascadeClassifier(self.DETECTOR_PATH)
 
-    def getDetectedFaces(self, image):
+    def getFacesFromImage(self, image):
         return self.__faceCascade.detectMultiScale(
             cvtColor(image, COLOR_BGR2GRAY),
             scaleFactor = 1.3,
@@ -17,7 +17,7 @@ class FaceDetector:
             flags = CASCADE_SCALE_IMAGE
         )
 
-    def drawRectangleOnImage(self, imagePath, image, faces):
+    def drawRectangleOnFaces(self, imagePath, image, faces):
         if (0 == len(faces)): return
         
         for (x, y, w, h) in faces:
@@ -29,6 +29,6 @@ class FaceDetector:
 
         image = imread(imagePath)
 
-        faces = self.getDetectedFaces(image)
+        faces = self.getFacesFromImage(image)
 
-        self.drawRectangleOnImage(imagePath, image, faces)
+        self.drawRectangleOnFaces(imagePath, image, faces)
