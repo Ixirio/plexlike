@@ -1,27 +1,83 @@
+{# 
+    Macro to display a card, used in movies/actors/producers lists.
+    Options are used to handle different action available depending on the item displayed
+ #}
 {% macro card(item, options) %}
-
-{% set itemRoute = url_for(options.contentType~'.find', id=item._id) %}
-
-<div class="group max-w-sm w-fit h-fit m-auto bg-primary rounded shadow hover:scale-110 transition-all duration-100" id="{{ item._id }}" data-item data-item-route="{{ itemRoute }}">
-    <img class="rounded" loading="lazy" src="{{ url_for('static', filename='images/'~options.contentType~'/'~item.image) }}" alt="{{ item.title }} movie poster"/>
-    {% if options.actions is defined %}
-    <div class="flex flex-row gap-2 opacity-0 group-hover:opacity-100 absolute bottom-0 right-0 group-hover:bottom-2 group-hover:right-2 transition-all duration-100">
-        {% if options.actions.isEditable is defined and options.actions.isEditable %}
-        <a href="{{ url_for(options.contentType~'.edit', id=item._id) }}" class="text-white hover:text-blue-500 transition-all duration-100">
-            <svg fill="currentColor" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                <path d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"/>
-            </svg>
-        </a>
-        {% endif %}
-        {% if options.actions.isRemovable is defined and options.actions.isRemovable %}
-        <a href="{{ url_for(options.contentType~'.remove', id=item._id) }}" class="text-white hover:text-red-500 transition-all duration-100">
-            <svg fill="currentColor" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
-            </svg>
-        </a>
+    <div class="group max-w-sm w-fit h-fit m-auto bg-primary rounded shadow transition-all duration-100 hover:cursor-pointer" id="{{ item._id }}"
+        {% if options.actions.showDetail is defined and options.actions.showDetail %}data-item data-item-route="{{ url_for(options.contentType~'.find', id=item._id) }}"{% endif %}>
+        <img class="transition-all duration-300 rounded group-hover:scale-110 w-48 h-64 object-cover" loading="lazy" src="{{ url_for('static', filename='images/'~options.contentType~'/'~item.image) }}" alt="{{ item.title }} movie poster"/>
+        {% if options.actions is defined %}
+        <div class="flex flex-row gap-2 opacity-0 group-hover:opacity-100 relative transition-all duration-100 bottom-0 group-hover:bottom-2">
+            {% if options.actions.isEditable is defined and options.actions.isEditable %}
+            <a data-item-action-ignore href="{{ url_for(options.contentType~'.edit', id=item._id) }}" class="text-white hover:text-blue-500 transition-all duration-100">
+                <svg data-item-action-ignore fill="currentColor" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path data-item-action-ignore d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"/>
+                </svg>
+            </a>
+            {% endif %}
+            {% if options.actions.isRemovable is defined and options.actions.isRemovable %}
+            <a data-item-action-ignore href="{{ url_for(options.contentType~'.remove', id=item._id) }}" class="text-white hover:text-red-500 transition-all duration-100">
+                <svg data-item-action-ignore fill="currentColor" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                    <path data-item-action-ignore d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                </svg>
+            </a>
+            {% endif %}
+        </div>
         {% endif %}
     </div>
-    {% endif %}
-</div>
+{% endmacro %}
 
+{# Macro used to display a list of item #}
+{% macro itemList(entities, options) %}
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-2 gap-y-6 transition-all duration-100" data-item-container>
+        {% for entity in entities %}
+            {{ card(entity, options) }}
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{# Macro used to display a bottom right fixed link button #}
+{% macro linkButton(options) %}
+    <a href="{{ options.url }}" class="flex fixed rounded-full bottom-5 right-5 w-14 h-14 bg-secondary text-secondary">
+        <svg fill="currentColor" class="w-8 h-8 m-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/>
+        </svg>
+    </a>
+{% endmacro %}
+
+{# Macro used to display a bottom right fixed submit button #}
+{% macro submitButton() %}
+    <button class="fixed rounded-full bottom-5 right-5 w-14 h-14 text-secondary bg-green-600" type="submit">
+      <svg fill="currentColor" class="w-8 h-8 m-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+          <path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V173.3c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32H64zm0 96c0-17.7 14.3-32 32-32H288c17.7 0 32 14.3 32 32v64c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V128zM224 288a64 64 0 1 1 0 128 64 64 0 1 1 0-128z" />
+      </svg>
+    </button>
+{% endmacro %}
+
+{# Macro used to display a form input to select an image #}
+{% macro imageFormField(options) %}
+    <div class="sm:col-span-3">
+        <label for="image" class="block text-sm font-medium leading-6">{{ options.label }}</label>
+        <div class="flex justify-center rounded-lg border border-gray-500 bg-gray-800 border-opacity-50 p-4">
+            <div class="text-center">
+                <div class="rounded-md overflow-hidden bg-cover bg-no-repeat max-w-fit mx-auto {{ 'mb-4' if options.entity }}">
+                    <img data-image-preview src="{{ url_for('static', filename='images/'~options.entityType~'/'~options.entity.image) if options.entity }}"
+                    class="transition-all duration-300 rounded-md hover:scale-110">
+                </div>
+                <div class="flex flex-col text-sm leading-6 text-gray-600 md:flex-row">
+                    <label for="image" class="mx-auto p-2 cursor-pointer rounded-md bg-blue-700 hover:bg-blue-800 font-semibold text-secondary hover:text-gray-200 transition-all duration-300">
+                        <span>Upload an image</span>
+                        <input data-image-input id="image" name="image" type="file" class="sr-only" accept="image/*">
+                    </label>
+                    <div class="mt-4 md:mt-2 md:ml-4">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="facedetection" name="facedetection" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Toggle face detection</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endmacro %}

@@ -1,4 +1,27 @@
-<div>
-
-    {{ movie._id }}
+<div class="flex flex-col md:flex-row md:space-x-4">
+    <img src="{{ url_for('static', filename='images/movies/'~movie.image) }}" alt="{{ movie.title }} movie poster" class="w-72 h-96">
+    <div class="text-secondary space-y-2">
+        <div>
+            <h2 class="text-xl font-semibold">About {{ movie.title }}</h2>
+            <span>{{ movie.description }}</span>
+        </div>
+        <div class="flex flex-col md:flex-row md:space-x-4">
+            <div class="flex flex-col">
+                <h2 class="text-lg font-semibold">Actors :</h2>
+                {% for actor in movie.actors %}
+                    <span> {{ actor.firstName }} {{ actor.lastName }} </span>
+                {% endfor %} 
+            </div>
+            <div class="flex flex-col">
+                <h2 class="text-lg font-semibold">Producers :</h2>
+                {% for producer in movie.producers %}
+                    <span> {{ producer.firstName }} {{ producer.lastName }} </span>
+                {% endfor %} 
+            </div>
+        </div>
+        <div>
+            <h2 class="text-lg font-semibold">Released on :</h2>
+            <span> {{ movie.year.strftime('%d/%m/%Y') }} </span>
+        </div>
+    </div>
 </div>

@@ -1,3 +1,4 @@
+// Ajax method to get data from the API
 async function getItemData(url, target) {
     $.ajax({
         method: 'GET',
@@ -8,42 +9,31 @@ async function getItemData(url, target) {
     });
 }
 
+// Method to open the itemFrame and get the data from API
 async function openItemFrame(itemFrame, item) {
-
     itemFrame.classList.remove('hidden');
 
-    console.log()
-   
-
-    closeFrameSelectors.forEach((selector) => {
-        itemFrame.querySelector(selector).addEventListener('click', () => {
-            itemFrame.classList.add('hidden');
-        });
-    });
     await getItemData(item.dataset.itemRoute, itemFrame.querySelector('[data-item-frame-body]'));
-
 }
 
-const closeFrameSelectors = [
-    '[data-item-frame-close-button]',
-    '[data-item-frame-backdrop]'
-]
-
+// Item frame Handler
 const itemFrameHandler = async () => {
 
     const itemFrame = document.querySelector('[data-item-frame]');
 
+    // add event to open item frame
     document.querySelectorAll('[data-item]').forEach((item) => {
-        item.addEventListener('click', () => {
-            openItemFrame(itemFrame, item);
+        item.addEventListener('click', (element) => {
+            if (!('itemActionIgnore' in element.target.dataset)) {
+                openItemFrame(itemFrame, item);
+            }
         });
     });
 
-    closeFrameSelectors.forEach((selector) => {
-        itemFrame.querySelector(selector).addEventListener('click', () => {
-            itemFrame.classList.add('hidden');
-            itemFrame.querySelector('[data-item-frame-body]').innerHTML = '';
-        });
+    // close the item frame and remove data from it 
+    itemFrame.querySelector('[data-item-frame-close-button]').addEventListener('click', () => {
+        itemFrame.classList.add('hidden');
+        itemFrame.querySelector('[data-item-frame-body]').innerHTML = '';
     });
 }
 

@@ -9,6 +9,7 @@ from time import time
 from services import FaceDetector
 from services.transformer import CheckboxValueToBoolTransformer
 
+# ActorBlueprint class
 class ActorBlueprint(Blueprint):
 
     IMAGE_UPLOAD_FOLDER = join(abspath(dirname(__name__)), 'src/static/images/actors')
@@ -16,19 +17,18 @@ class ActorBlueprint(Blueprint):
     __actorRepository: ActorRepository
     __checkboxValueToBoolTransformer: CheckboxValueToBoolTransformer
 
+    # ActorBlueprint constructor
     def __init__(self, import_name: str, db: database.Database, **kwargs):
         super().__init__('actors', import_name, url_prefix="/actors", **kwargs)
         self.__actorRepository = ActorRepository(db.get_collection('actors'))
         self.__checkboxValueToBoolTransformer = CheckboxValueToBoolTransformer()
 
+        # route to render all actors from database
         @self.route('/list', methods=['GET'])
         def findAll():
             return render_template('actors/list.jinja', actors=self.__actorRepository.findAll())
 
-        @self.route('/<id>', methods=['GET'])
-        def find(id):
-            return render_template('actors/actor.jinja', actor=self.__actorRepository.findById(id))
-
+        # route to render a form to create a new actor
         @self.route('/add', methods=['GET', 'POST'])
         def add():
             if request.method == 'POST':    
@@ -58,6 +58,7 @@ class ActorBlueprint(Blueprint):
 
             return render_template('actors/form.jinja')
 
+        # route to handle actor edition
         @self.route('/edit/<id>', methods=['GET', 'POST'])
         def edit(id):
 
@@ -99,6 +100,7 @@ class ActorBlueprint(Blueprint):
 
             return render_template('actors/form.jinja', actor=actor)
 
+        # route to handle actor deletion
         @self.route('/remove/<id>', methods=['GET'])
         def remove(id):
             removeFile(join(self.IMAGE_UPLOAD_FOLDER, self.__actorRepository.findById(id)['image']))
@@ -107,6 +109,7 @@ class ActorBlueprint(Blueprint):
             flash('Actor removed sucessfully', 'success')
             return redirect(url_for('actors.findAll'))
 
+    # method to check that each fields of the form are fullfilled
     def isFormFullFilled(self, request: Request, imageIsPresent: bool = False) -> bool:
         for input in request.form:
             if request.form.get(input) in ['', None]:

@@ -2,10 +2,12 @@ from pymongo import collection
 from bson import ObjectId
 from entity import Actor
 
+# ActorRepository class
 class ActorRepository:
 
     __collection : collection.Collection
 
+    # ActorRepository constructor
     def __init__(self, collection : collection.Collection) -> None:
         self.__collection = collection
 

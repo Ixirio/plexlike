@@ -9,6 +9,7 @@ from time import time
 from services import FaceDetector
 from services.transformer import CheckboxValueToBoolTransformer
 
+# ProducerBlueprint class
 class ProducerBlueprint(Blueprint):
 
     IMAGE_UPLOAD_FOLDER = join(abspath(dirname(__name__)), 'src/static/images/producers')
@@ -16,19 +17,18 @@ class ProducerBlueprint(Blueprint):
     __producerRepository: ProducerRepository
     __checkboxValueToBoolTransformer: CheckboxValueToBoolTransformer
 
+    # ProducerBlueprint constructor
     def __init__(self, import_name: str, db: database.Database, **kwargs):
         super().__init__('producers', import_name, url_prefix="/producers", **kwargs)
         self.__producerRepository = ProducerRepository(db.get_collection('producers'))
         self.__checkboxValueToBoolTransformer = CheckboxValueToBoolTransformer()
 
+        # route to render all producers from database
         @self.route('/list', methods=['GET'])
         def findAll():
             return render_template('producers/list.jinja', producers=self.__producerRepository.findAll())
 
-        @self.route('/<id>', methods=['GET'])
-        def find(id):
-            return render_template('producers/producer.jinja', producer=self.__producerRepository.findById(id))
-
+        # route to render a form to create a new producer
         @self.route('/add', methods=['GET', 'POST'])
         def add():
             if request.method == 'POST':    
@@ -58,6 +58,7 @@ class ProducerBlueprint(Blueprint):
 
             return render_template('producers/form.jinja')
 
+        # route to handle producer edition
         @self.route('/edit/<id>', methods=['GET', 'POST'])
         def edit(id):
 
@@ -99,6 +100,7 @@ class ProducerBlueprint(Blueprint):
 
             return render_template('producers/form.jinja', producer=producer)
 
+        # route to handle producer deletion
         @self.route('/remove/<id>', methods=['GET'])
         def remove(id):
             removeFile(join(self.IMAGE_UPLOAD_FOLDER, self.__producerRepository.findById(id)['image']))
@@ -107,6 +109,7 @@ class ProducerBlueprint(Blueprint):
             flash('Producer removed sucessfully', 'success')
             return redirect(url_for('producers.findAll'))
 
+    # method to check that each fields of the form are fullfilled 
     def isFormFullFilled(self, request: Request, imageIsPresent: bool = False) -> bool:
         for input in request.form:
             if request.form.get(input) in ['', None]:
